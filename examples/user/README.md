@@ -52,7 +52,7 @@ $ restart user:api
     {"_id": "55cd34276834073adc4a8170"}
     ```
 
-3. GET /users/<pk>
+3. GET /users/pk
 
     ```
     $ curl -i http://127.0.0.1:5000/users/55cd34276834073adc4a8170
@@ -65,7 +65,7 @@ $ restart user:api
     {"password": "123456", "_id": "55cd34276834073adc4a8170", "name": "russell", "date_joined": "2015-08-14T00:00:00Z"}
     ```
 
-4. PUT /users/<pk>
+4. PUT /users/pk
 
     ```
     $ curl -i -X PUT -H "Content-Type: application/json" -d '{
@@ -81,25 +81,25 @@ $ restart user:api
 
     ```
 
-5. PATCH /users/<pk>
+5. PATCH /users/pk
 
-Please refer to [RFC 6902][1] for the exact JSON Patch syntax.
+    Please refer to [RFC 6902][1] for the exact JSON Patch syntax.
 
-```
-$ curl -i -X PATCH -H "Content-Type: application/json" -d '[{
-    "op": "add",
-    "path": "/password",
-    "value": "666666"
-}]' http://127.0.0.1:5000/users/55cd34276834073adc4a8170
-HTTP/1.0 204 NO CONTENT
-Content-Type: application/json
-Content-Length: 0
-Server: Werkzeug/0.10.4 Python/2.7.6
-Date: Fri, 14 Aug 2015 00:23:47 GMT
+    ```
+    $ curl -i -X PATCH -H "Content-Type: application/json" -d '[{
+        "op": "add",
+        "path": "/password",
+        "value": "666666"
+    }]' http://127.0.0.1:5000/users/55cd34276834073adc4a8170
+    HTTP/1.0 204 NO CONTENT
+    Content-Type: application/json
+    Content-Length: 0
+    Server: Werkzeug/0.10.4 Python/2.7.6
+    Date: Fri, 14 Aug 2015 00:23:47 GMT
 
-```
+    ```
 
-6. DELETE /users/<pk>
+6. DELETE /users/pk
 
     ```
     curl -i -X DELETE http://127.0.0.1:5000/users/55cd34276834073adc4a8170
