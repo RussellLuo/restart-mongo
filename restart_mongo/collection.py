@@ -7,6 +7,7 @@ from jsonpatch import JsonPatch
 from restart import status
 from restart.resource import Resource
 from restart.exceptions import NotFound
+from restart.utils import make_location_header
 
 from .form import Form
 from .filter import Filter
@@ -105,7 +106,8 @@ class Collection(Resource):
         form = self.form_class(request.data)
         if form.is_valid():
             _id = self.engine.insert(form.document)
-            return {'_id': _id}, status.HTTP_201_CREATED
+            headers = {'Location': make_location_header(request, _id)}
+            return {'_id': _id}, status.HTTP_201_CREATED, headers
         return form.errors, status.HTTP_400_BAD_REQUEST
 
     def read(self, request, pk):
