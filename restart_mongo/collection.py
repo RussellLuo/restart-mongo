@@ -95,8 +95,10 @@ class Collection(Resource):
             sort=sort, fields=fields
         )
         count = self.engine.find(spec=lookup).count()
-        headers = self.paginator.make_headers(request.uri, page,
-                                              per_page, count)
+        headers = self.paginator.make_headers(
+            request.uri.split('?', 1)[0],
+            page, per_page, count
+        )
         return list(docs), status.HTTP_200_OK, headers
 
     def create(self, request):

@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-from restart.config import config
-
 
 class Paginator(object):
     """The class for pagination.
@@ -51,8 +49,8 @@ class Paginator(object):
         links = []
 
         def add_link(page, per_page, rel):
-            args = (config.SERVER_NAME, uri, page, per_page, rel)
-            links.append('<%s%s?page=%s&per_page=%s>; rel="%s"' % args)
+            args = (uri, page, per_page, rel)
+            links.append('<%s?page=%s&per_page=%s>; rel="%s"' % args)
 
         def add_prev_link():
             add_link(page - 1, per_page, 'prev')
