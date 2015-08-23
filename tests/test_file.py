@@ -39,14 +39,17 @@ class TestFile(object):
     def teardown_class(cls):
         shutil.rmtree(cls.tempdir)
 
-    def make_resource(self, action_map=config.ACTION_MAP):
+    def make_resource(self, **actions):
+        action_map = config.ACTION_MAP.copy()
+        if actions:
+            action_map.update(actions)
         return Image(action_map)
 
     def get_data(self, ext='.png'):
         data = {'image': (StringIO('this is an image'), 'test%s' % ext)}
         return data
 
-    def create_file(self, ext='.png'):
+    def create_image(self, ext='.png'):
         request = factory.post('/images', data=self.get_data(ext))
         resource = self.make_resource()
         response = resource.dispatch_request(request)
@@ -58,8 +61,8 @@ class TestFile(object):
         filename = os.path.join(Image.upload_folder, path)
         assert os.path.isfile(filename) == exists
 
-    def test_create_file(self):
-        response = self.create_file()
+    def test_create_image(self):
+        response = self.create_image()
 
         # Assert the response
         assert '_id' in response.data
@@ -77,8 +80,8 @@ class TestFile(object):
         # Assert the file system
         self.assert_exists(image['storage_path'], True)
 
-    def test_create_file_with_disallowed_extension(self):
-        response = self.create_file(ext='.txt')
+    def test_create_image_with_disallowed_extension(self):
+        response = self.create_image(ext='.txt')
 
         # Assert the response
         assert response.data == {
@@ -87,15 +90,16 @@ class TestFile(object):
         }
         assert response.status_code == 400
 
-    def test_replace_file(self):
-        response = self.create_file()
+    def test_replace_image(self):
+        response = self.create_image()
         _id = response.data['_id']
 
         # Save the storage path for later use
         image = db.image.find_one({'_id': bson.ObjectId(_id)})
         storage_path = image['storage_path']
 
-        request = factory.put('/images', data=self.get_data(ext='.jpg'))
+        request = factory.put('/images/%s' % _id,
+                              data=self.get_data(ext='.jpg'))
         resource = self.make_resource()
         response = resource.dispatch_request(request, _id)
 
@@ -112,11 +116,11 @@ class TestFile(object):
         self.assert_exists(storage_path, False)
         self.assert_exists(image['storage_path'], True)
 
-    def test_update_file(self):
-        response = self.create_file()
+    def test_update_image(self):
+        response = self.create_image()
         _id = response.data['_id']
 
-        request = factory.patch('/images', data=self.get_data())
+        request = factory.patch('/images/%s' % _id, data=self.get_data())
         resource = self.make_resource()
         response = resource.dispatch_request(request, _id)
 
@@ -125,15 +129,15 @@ class TestFile(object):
                                  'for the requested URL."}')
         assert response.status_code == 405
 
-    def test_delete_file(self):
-        response = self.create_file()
+    def test_delete_image(self):
+        response = self.create_image()
         _id = response.data['_id']
 
         # Save the storage path for later use
         image = db.image.find_one({'_id': bson.ObjectId(_id)})
         storage_path = image['storage_path']
 
-        request = factory.delete('/images', data=self.get_data())
+        request = factory.delete('/images/%s' % _id, data=self.get_data())
         resource = self.make_resource()
         response = resource.dispatch_request(request, _id)
 
