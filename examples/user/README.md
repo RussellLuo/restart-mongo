@@ -102,7 +102,7 @@ $ restart user:api
 6. DELETE /users/pk
 
     ```
-    curl -i -X DELETE http://127.0.0.1:5000/users/55cd34276834073adc4a8170
+    $ curl -i -X DELETE http://127.0.0.1:5000/users/55cd34276834073adc4a8170
     HTTP/1.0 204 NO CONTENT
     Content-Type: application/json
     Content-Length: 0
