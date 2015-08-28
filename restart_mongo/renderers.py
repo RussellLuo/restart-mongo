@@ -83,8 +83,12 @@ class CSVRenderer(Renderer):
         """
         assert isinstance(self.columns, tuple), \
             'The `columns` attribute must be a tuple object'
-        assert isinstance(data, dict), \
-            'The `data` argument must be a dict object'
+        assert isinstance(data, (dict, list, tuple)), \
+            'The `data` argument must be a dict or a list or a tuple'
+
+        # Assure that data is a sequence
+        if isinstance(data, dict):
+            data = [data]
 
         csv_file = StringIO()
         csv_writer = UnicodeCSVWriter(csv_file)
@@ -93,27 +97,30 @@ class CSVRenderer(Renderer):
         headers = [column[0] for column in self.columns]
         csv_writer.writerow(headers)
 
-        # Extract values
-        values = []
-        for _, fieldname, converter in self.columns:
-            keys = fieldname.split('.')
+        # Write rows
+        for each in data:
+            values = []
 
-            # Get the value of `fieldname` from `data`
-            value = data
-            for key in keys:
-                value = value.get(key)
-                if value is None:
-                    value = self.default_value
-                    break
+            # Extract values
+            for _, fieldname, converter in self.columns:
+                keys = fieldname.split('.')
 
-            # Convert the value if possible
-            if converter is not None:
-                value = converter(value)
+                # Get the value of `fieldname` from `each`
+                value = each
+                for key in keys:
+                    value = value.get(key)
+                    if value is None:
+                        value = self.default_value
+                        break
 
-            values.append(value)
+                # Convert the value if possible
+                if converter is not None:
+                    value = converter(value)
 
-        # Write values
-        csv_writer.writerow(values)
+                values.append(value)
+
+            # Write values
+            csv_writer.writerow(values)
 
         csv_data = csv_file.getvalue()
         return csv_data

@@ -48,18 +48,30 @@ class TestRenderers(object):
         expected_exc_msg = 'The `columns` attribute must be a tuple object'
         assert str(exc.value) == expected_exc_msg
 
-    def test_user_csv_renderer_with_non_dict_data(self):
+    def test_user_csv_renderer_with_invalid_data(self):
         renderer = UserCSVRenderer()
 
         with pytest.raises(AssertionError) as exc:
             renderer.render('')
 
-        expected_exc_msg = 'The `data` argument must be a dict object'
-        assert str(exc.value) == expected_exc_msg
+        assert str(exc.value) == ('The `data` argument must be a dict or '
+                                  'a list or a tuple')
 
     def test_user_csv_renderer_with_dict_data(self):
         renderer = UserCSVRenderer()
         rendered = renderer.render(self.data)
+        assert rendered == ('name,age,phone,missing\r\n'
+                            'Russell,8,123456,\r\n')
+
+    def test_user_csv_renderer_with_list_data(self):
+        renderer = UserCSVRenderer()
+        rendered = renderer.render([self.data])
+        assert rendered == ('name,age,phone,missing\r\n'
+                            'Russell,8,123456,\r\n')
+
+    def test_user_csv_renderer_with_tuple_data(self):
+        renderer = UserCSVRenderer()
+        rendered = renderer.render((self.data,))
         assert rendered == ('name,age,phone,missing\r\n'
                             'Russell,8,123456,\r\n')
 
