@@ -24,3 +24,4 @@ Some examples showing how to use `RESTArt-Mongo`.
 
 1. [User](user)
 2. [Image](image)
+3. [CSV](csv)
