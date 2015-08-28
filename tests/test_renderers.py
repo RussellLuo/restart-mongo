@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import absolute_import
 
 import pytest
@@ -15,6 +17,15 @@ class UserCSVRenderer(CSVRenderer):
         ('age', 'age', None),
         ('phone', 'contact.phone', unicode),
         ('missing', 'missing', unicode),
+    )
+
+
+class UnicodeUserCSVRenderer(CSVRenderer):
+    columns = (
+        (u'名字', 'name', capitalize),
+        (u'年龄', 'age', None),
+        (u'电话', 'contact.phone', unicode),
+        (u'缺失', 'missing', unicode),
     )
 
 
@@ -51,3 +62,9 @@ class TestRenderers(object):
         rendered = renderer.render(self.data)
         assert rendered == ('name,age,phone,missing\r\n'
                             'Russell,8,123456,\r\n')
+
+    def test_unicode_user_csv_renderer_with_dict_data(self):
+        renderer = UnicodeUserCSVRenderer()
+        rendered = renderer.render(self.data)
+        assert rendered.decode('utf-8') == (u'名字,年龄,电话,缺失\r\n'
+                                             'Russell,8,123456,\r\n')

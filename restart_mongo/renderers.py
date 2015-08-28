@@ -1,9 +1,47 @@
 from __future__ import absolute_import
 
 import csv
+import codecs
 from cStringIO import StringIO
 
 from restart.renderers import Renderer
+
+
+class UnicodeCSVWriter(object):
+    """A CSV writer that can write Unicode rows to the CSV file,
+    which is encoded in the given encoding.
+
+    According to https://docs.python.org/2/library/csv.html::
+        The standard version of the `csv` module does not
+        support Unicode input.
+
+    Borrowed from https://docs.python.org/2/library/csv.html#examples.
+    """
+    def __init__(self, csvfile, dialect=csv.excel,
+                 encoding='utf-8', **kwargs):
+        self.queue = StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwargs)
+        self.stream = csvfile
+        self.encoder = codecs.getincrementalencoder(encoding)()
+
+    def writerow(self, row):
+        self.writer.writerow([unicode(s).encode('utf-8') for s in row])
+
+        # Fetch utf-8 output from the queue
+        data = self.queue.getvalue()
+        data = data.decode('utf-8')
+        # And reencode it into the target encoding
+        data = self.encoder.encode(data)
+
+        # Write to the target stream
+        self.stream.write(data)
+
+        # Empty the queue
+        self.queue.truncate(0)
+
+    def writerows(self, rows):
+        for row in rows:
+            self.write(row)
 
 
 class CSVRenderer(Renderer):
@@ -49,7 +87,7 @@ class CSVRenderer(Renderer):
             'The `data` argument must be a dict object'
 
         csv_file = StringIO()
-        csv_writer = csv.writer(csv_file)
+        csv_writer = UnicodeCSVWriter(csv_file)
 
         # Write headers
         headers = [column[0] for column in self.columns]
