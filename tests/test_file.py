@@ -8,7 +8,7 @@ from datetime import datetime
 from cStringIO import StringIO
 
 import bson
-from restart.ext.mongo.file import File
+from restart.ext.mongo.ext.file import File
 from restart.config import config
 from restart.testing import RequestFactory
 from mongomock import Connection

@@ -6,8 +6,7 @@ from datetime import datetime
 
 from restart.exceptions import BadRequest, MethodNotAllowed
 from restart.ext.mongo.collection import Collection
-
-from .utils import ensure_dir
+from restart.ext.mongo.utils import ensure_dir
 
 
 class File(Collection):

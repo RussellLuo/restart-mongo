@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from restart.api import RESTArt
-from restart.ext.mongo.file import File
+from restart.ext.mongo.ext.file import File
 from pymongo import MongoClient
 
 api = RESTArt()

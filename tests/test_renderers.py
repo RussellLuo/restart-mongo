@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import pytest
 
-from restart.ext.mongo.renderers import CSVRenderer
+from restart.ext.mongo.ext.renderers import CSVRenderer
 
 
 def capitalize(value):
