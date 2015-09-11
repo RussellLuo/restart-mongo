@@ -14,6 +14,7 @@ from .filter import Filter
 from .paginator import Paginator
 from .sorter import Sorter
 from .selector import Selector
+from .middlewares import SerializerMiddleware
 from .utils import get_exception_detail
 
 
@@ -46,9 +47,7 @@ class Collection(Resource):
     #: The selector object
     selector = Selector()
 
-    middleware_classes = (
-        'restart.ext.mongo.middleware.SerializerMiddleware',
-    )
+    middleware_classes = (SerializerMiddleware,)
 
     def __init__(self, *arg, **kwargs):
         if self.database is None:
