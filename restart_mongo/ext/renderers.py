@@ -41,7 +41,7 @@ class UnicodeCSVWriter(object):
 
     def writerows(self, rows):
         for row in rows:
-            self.write(row)
+            self.writerow(row)
 
 
 class CSVRenderer(Renderer):
