@@ -7,12 +7,12 @@ import bson
 from restart.ext.mongo.collection import Collection
 from restart.config import config
 from restart.testing import RequestFactory
-from mongomock import Connection
+from mongomock import MongoClient
 
 
 factory = RequestFactory()
 
-db = Connection().test
+db = MongoClient().test
 
 
 class User(Collection):

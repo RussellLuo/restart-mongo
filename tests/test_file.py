@@ -11,14 +11,14 @@ import bson
 from restart.ext.mongo.ext.file import File
 from restart.config import config
 from restart.testing import RequestFactory
-from mongomock import Connection
+from mongomock import MongoClient
 
 
 factory = RequestFactory()
 now = datetime.now()
 
 tempdir = tempfile.mkdtemp()
-db = Connection().test
+db = MongoClient().test
 
 
 class Image(File):
