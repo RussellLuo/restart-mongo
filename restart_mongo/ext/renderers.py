@@ -48,23 +48,55 @@ class CSVRenderer(Renderer):
     """The CSV renderer class."""
 
     #: A tuple that specifies the columns in the CSV.
-    #: Each item of `columns` is also a tuple in the form
-    #: `(header, fieldname, converter)`.
+    #:
+    #: Each item of `columns` is also a tuple in the form of
+    #: `(header, fieldname)` or `(header, fieldname, converter)`.
+    #:
+    #: - header: The column header.
+    #: - fieldname: The name of the field in the database, which
+    #:              provides the original column value. To represent
+    #:              a nested field, use dot (`.`) in its name.
+    #: - converter: The converter used to make the final column value.
+    #:
+    #: The converter is determined in the following order:
+    #:
+    #:     1. The converter defined in the 3-tuple. Any function with
+    #:        the following prototype can be specified as a converter
+    #:        in the form of 3-tuple:
+    #:
+    #:         def converter(value):
+    #:             return converted_value
+    #:
+    #:     2. The converter defined as a method, which has the following
+    #:        prototype:
+    #:
+    #:         def convert_<fieldname>(self, value):
+    #:             return converted_value
+    #:
+    #:        Note that the `fieldname` part is the column fieldname with
+    #:        all its dots (`.`) transformed to underscores (`_`).
+    #:
+    #:     3. If not specified, use the default converter (`unicode`).
     #:
     #: For example:
     #:
     #:     def capitalize(value):
     #:         return value.capitalize()
     #:
-    #:     columns = (
-    #:         # A simple fieldname with a customized `capitalize` converter
-    #:         ('name', 'username', capitalize),
-    #:         # A simple fieldname without converter
-    #:         ('age', 'age', None),
-    #:         # A nested fieldname with the built-in `unicode` converter
-    #:         ('phone', 'contact.phone', unicode),
-    #:         ...
-    #:     )
+    #:     class UserCSVRenderer(CSVRenderer):
+    #:
+    #:         columns = (
+    #:             # A simple fieldname with the function-style converter
+    #:             ('name', 'username', capitalize),
+    #:             # A simple fieldname with the default converter
+    #:             ('age', 'age'),
+    #:             # A nested fieldname with the method-style converter
+    #:             ('phone', 'contact.phone'),
+    #:             ...
+    #:         )
+    #:
+    #:         def convert_contact_phone(self, value):
+    #:             return unicode('086-%s' % value)
     columns = None
 
     #: The default value for the missing field specified in the `columns`
@@ -102,7 +134,14 @@ class CSVRenderer(Renderer):
             values = []
 
             # Extract values
-            for _, fieldname, converter in self.columns:
+            for column in self.columns:
+                if len(column) == 2:
+                    _, fieldname = column
+                    methodname = 'convert_%s' % fieldname.replace('.', '_')
+                    converter = getattr(self, methodname, unicode)
+                else:
+                    _, fieldname, converter = column
+
                 keys = fieldname.split('.')
 
                 # Get the value of `fieldname` from `each`
@@ -113,9 +152,8 @@ class CSVRenderer(Renderer):
                         value = self.default_value
                         break
 
-                # Convert the value if possible
-                if converter is not None:
-                    value = converter(value)
+                # Convert the value
+                value = converter(value)
 
                 values.append(value)
 

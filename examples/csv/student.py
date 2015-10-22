@@ -13,9 +13,9 @@ api = RESTArt()
 
 class StudentCSVRenderer(CSVRenderer):
     columns = (
-        (u'姓名', 'name', unicode),
-        (u'科目', 'course', unicode),
-        (u'成绩', 'score', unicode),
+        (u'姓名', 'name'),
+        (u'科目', 'course'),
+        (u'成绩', 'score'),
     )
 
 
