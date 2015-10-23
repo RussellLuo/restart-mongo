@@ -108,13 +108,34 @@ class CSVRenderer(Renderer):
     #: The format suffix bound to this renderer.
     format_suffix = 'csv'
 
+    def get_schema(self):
+        """Get the CSV schema."""
+        assert isinstance(self.columns, tuple), \
+            'The `columns` attribute must be a tuple object'
+
+        headers = []
+        fields = []
+
+        for column in self.columns:
+            if len(column) == 2:
+                header, fieldname = column
+                methodname = 'convert_%s' % fieldname.replace('.', '_')
+                converter = getattr(self, methodname, unicode)
+            else:
+                header, fieldname, converter = column
+
+            headers.append(header)
+
+            keys = fieldname.split('.')
+            fields.append((keys, converter))
+
+        return headers, fields
+
     def render(self, data):
         """Render `data` into CSV.
 
         :param data: the data to be rendered.
         """
-        assert isinstance(self.columns, tuple), \
-            'The `columns` attribute must be a tuple object'
         assert isinstance(data, (dict, list, tuple)), \
             'The `data` argument must be a dict or a list or a tuple'
 
@@ -122,28 +143,20 @@ class CSVRenderer(Renderer):
         if isinstance(data, dict):
             data = [data]
 
+        headers, fields = self.get_schema()
+
         csv_file = StringIO()
         csv_writer = UnicodeCSVWriter(csv_file)
 
-        # Write headers
-        headers = [column[0] for column in self.columns]
+        # Write the headers
         csv_writer.writerow(headers)
 
-        # Write rows
+        # Write the rows
         for each in data:
             values = []
 
-            # Extract values
-            for column in self.columns:
-                if len(column) == 2:
-                    _, fieldname = column
-                    methodname = 'convert_%s' % fieldname.replace('.', '_')
-                    converter = getattr(self, methodname, unicode)
-                else:
-                    _, fieldname, converter = column
-
-                keys = fieldname.split('.')
-
+            # Extract the values
+            for keys, converter in fields:
                 # Get the value of `fieldname` from `each`
                 value = each
                 for key in keys:
@@ -157,7 +170,7 @@ class CSVRenderer(Renderer):
 
                 values.append(value)
 
-            # Write values
+            # Write the values
             csv_writer.writerow(values)
 
         csv_data = csv_file.getvalue()
