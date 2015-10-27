@@ -49,7 +49,7 @@ class Collection(Resource):
 
     middleware_classes = (SerializerMiddleware,)
 
-    def __init__(self, *arg, **kwargs):
+    def __init__(self, *args, **kwargs):
         if self.database is None:
             raise AttributeError('The class-level attribute `database` '
                                  'must be specified.')
@@ -60,7 +60,7 @@ class Collection(Resource):
         self.engine = self.database[self.collection_name]
         self.filter = self.filter_class(self.database, self.collection_name)
 
-        super(Collection, self).__init__(*arg, **kwargs)
+        super(Collection, self).__init__(*args, **kwargs)
 
     def get_pk(self, pk):
         try:
