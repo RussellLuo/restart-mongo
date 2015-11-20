@@ -8,7 +8,7 @@ from datetime import datetime
 from cStringIO import StringIO
 
 import bson
-from restart.ext.mongo.ext.file import File
+from restart.ext.mongo.ext.files import Files
 from restart.config import config
 from restart.testing import RequestFactory
 from mongomock import MongoClient
@@ -21,7 +21,7 @@ tempdir = tempfile.mkdtemp()
 db = MongoClient().test
 
 
-class Image(File):
+class Images(Files):
     name = 'images'
 
     upload_folder = tempdir
@@ -31,7 +31,7 @@ class Image(File):
     collection_name = 'image'
 
 
-class TestFile(object):
+class TestFiles(object):
 
     def setup_class(cls):
         cls.tempdir = tempdir
@@ -43,7 +43,7 @@ class TestFile(object):
         action_map = config.ACTION_MAP.copy()
         if actions:
             action_map.update(actions)
-        return Image(action_map)
+        return Images(action_map)
 
     def get_data(self, ext='.png', form_data=None):
         data = {'image': (StringIO('this is an image'), 'test%s' % ext)}
@@ -60,7 +60,7 @@ class TestFile(object):
         return response
 
     def assert_exists(self, path, exists):
-        filename = os.path.join(Image.upload_folder, path)
+        filename = os.path.join(Images.upload_folder, path)
         assert os.path.isfile(filename) == exists
 
     def test_create_image(self):
@@ -75,7 +75,7 @@ class TestFile(object):
         image = db.image.find_one({'_id': _id})
         assert image is not None
         assert image['initial_name'] == 'test.png'
-        archive_name = now.strftime(Image.archive_name_format)
+        archive_name = now.strftime(Images.archive_name_format)
         assert image['storage_path'].startswith(archive_name)
         assert image['date_uploaded'].date() == now.date()
 
@@ -95,7 +95,7 @@ class TestFile(object):
         image = db.image.find_one({'_id': _id})
         assert image is not None
         assert image['initial_name'] == 'test.png'
-        archive_name = now.strftime(Image.archive_name_format)
+        archive_name = now.strftime(Images.archive_name_format)
         assert image['storage_path'].startswith(archive_name)
         assert image['date_uploaded'].date() == now.date()
         assert image['extra_field'] == form_data['extra_field']
