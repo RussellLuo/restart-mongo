@@ -16,11 +16,12 @@ class File(Collection):
         1. The file content will be stored to server's file system.
         2. The file meta-data will be saved into the database.
 
-        The meta-data schema:
+        The document schema:
             {
                 initial_name (The initial file name)
                 storage_path (The final storage path)
                 date_uploaded (The date uploaded)
+                ... (The form data from request)
             }
     """
 
@@ -87,21 +88,36 @@ class File(Collection):
 
         return fileobj
 
+    def get_file_metadata(self, fileobj):
+        """Get the file meta-data from the file object."""
+        date_uploaded = datetime.now()
+        storage_path = self.get_storage_path(fileobj.filename, date_uploaded)
+
+        return dict(
+            initial_name=fileobj.filename,
+            storage_path=storage_path,
+            date_uploaded=date_uploaded
+        )
+
+    def update_request(self, request, file_metadata):
+        """Update the request object.
+
+        Now only merge the file meta-data into the request data.
+        Override to implement your own strategy.
+        """
+        request.data.update(file_metadata)
+        return request
+
     def create(self, request):
         """Create a new file."""
         fileobj = self.get_fileobj(request.files)
 
         # Store the file content to the file system
-        date_uploaded = datetime.now()
-        storage_path = self.get_storage_path(fileobj.filename, date_uploaded)
-        self.save_file(fileobj, storage_path)
+        file_metadata = self.get_file_metadata(fileobj)
+        self.save_file(fileobj, file_metadata['storage_path'])
 
         # Save the file meta-data into the database
-        request._data = dict(
-            initial_name=fileobj.filename,
-            storage_path=storage_path,
-            date_uploaded=date_uploaded
-        )
+        request = self.update_request(request, file_metadata)
         return super(File, self).create(request)
 
     def replace(self, request, pk):
@@ -113,16 +129,11 @@ class File(Collection):
         self.remove_file(doc['storage_path'])
 
         # Store the new file content to the file system
-        date_uploaded = datetime.now()
-        storage_path = self.get_storage_path(fileobj.filename, date_uploaded)
-        self.save_file(fileobj, storage_path)
+        file_metadata = self.get_file_metadata(fileobj)
+        self.save_file(fileobj, file_metadata['storage_path'])
 
         # Save the new file meta-data into the database
-        request._data = dict(
-            initial_name=fileobj.filename,
-            storage_path=storage_path,
-            date_uploaded=date_uploaded
-        )
+        request = self.update_request(request, file_metadata)
         return super(File, self).replace(request, pk)
 
     def update(self, request, pk):
