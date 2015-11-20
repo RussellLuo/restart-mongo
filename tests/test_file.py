@@ -45,12 +45,14 @@ class TestFile(object):
             action_map.update(actions)
         return Image(action_map)
 
-    def get_data(self, ext='.png'):
+    def get_data(self, ext='.png', form_data=None):
         data = {'image': (StringIO('this is an image'), 'test%s' % ext)}
+        if isinstance(form_data, dict):
+            data.update(form_data)
         return data
 
-    def create_image(self, ext='.png'):
-        request = factory.post('/images', data=self.get_data(ext))
+    def create_image(self, ext='.png', form_data=None):
+        request = factory.post('/images', data=self.get_data(ext, form_data))
         resource = self.make_resource()
         response = resource.dispatch_request(request)
         # Convert the response string (JSON) to a dict
@@ -76,6 +78,27 @@ class TestFile(object):
         archive_name = now.strftime(Image.archive_name_format)
         assert image['storage_path'].startswith(archive_name)
         assert image['date_uploaded'].date() == now.date()
+
+        # Assert the file system
+        self.assert_exists(image['storage_path'], True)
+
+    def test_create_image_with_form_data(self):
+        form_data = {'extra_field': 'some value'}
+        response = self.create_image(form_data=form_data)
+
+        # Assert the response
+        assert '_id' in response.data
+        assert response.status_code == 201
+
+        # Assert the database
+        _id = bson.ObjectId(response.data['_id'])
+        image = db.image.find_one({'_id': _id})
+        assert image is not None
+        assert image['initial_name'] == 'test.png'
+        archive_name = now.strftime(Image.archive_name_format)
+        assert image['storage_path'].startswith(archive_name)
+        assert image['date_uploaded'].date() == now.date()
+        assert image['extra_field'] == form_data['extra_field']
 
         # Assert the file system
         self.assert_exists(image['storage_path'], True)
@@ -111,6 +134,36 @@ class TestFile(object):
         image = db.image.find_one({'_id': bson.ObjectId(_id)})
         assert image is not None
         assert image['initial_name'] == 'test.jpg'
+
+        # Assert the file system
+        self.assert_exists(storage_path, False)
+        self.assert_exists(image['storage_path'], True)
+
+    def test_replace_image_with_form_data(self):
+        form_data = {'extra_field': 'some value'}
+        response = self.create_image(form_data=form_data)
+        _id = response.data['_id']
+
+        # Save the storage path for later use
+        image = db.image.find_one({'_id': bson.ObjectId(_id)})
+        storage_path = image['storage_path']
+
+        new_form_data = {'extra_field': 'some new value'}
+        request = factory.put('/images/%s' % _id,
+                              data=self.get_data(ext='.jpg',
+                                                 form_data=new_form_data))
+        resource = self.make_resource()
+        response = resource.dispatch_request(request, _id)
+
+        # Assert the response
+        assert response.data == '""'
+        assert response.status_code == 204
+
+        # Assert the database
+        image = db.image.find_one({'_id': bson.ObjectId(_id)})
+        assert image is not None
+        assert image['initial_name'] == 'test.jpg'
+        assert image['extra_field'] == new_form_data['extra_field']
 
         # Assert the file system
         self.assert_exists(storage_path, False)
