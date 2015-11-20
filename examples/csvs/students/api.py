@@ -23,7 +23,7 @@ class StudentCSVRenderer(CSVRenderer):
            actions={'GET': 'index'}, format_suffix='optional')
 @api.route(uri='/students/<pk>', endpoint='students_item', methods=['GET'],
            format_suffix='optional')
-class Student(Collection):
+class Students(Collection):
     name = 'students'
 
     database = MongoClient().test

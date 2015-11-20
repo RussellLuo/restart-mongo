@@ -8,7 +8,7 @@ api = RESTArt()
 
 
 @api.register
-class User(Collection):
+class Users(Collection):
     name = 'users'
 
     database = MongoClient().test

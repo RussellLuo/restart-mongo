@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from restart.api import RESTArt
-from restart.ext.mongo.ext.file import File
+from restart.ext.mongo.ext.files import Files
 from pymongo import MongoClient
 
 api = RESTArt()
@@ -16,7 +16,7 @@ def make_tempdir():
 
 
 @api.register
-class Image(File):
+class Images(Files):
     name = 'images'
 
     upload_folder = make_tempdir()

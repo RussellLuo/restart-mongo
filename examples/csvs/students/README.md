@@ -1,4 +1,4 @@
-# Student
+# Students
 
 An example showing how to export MongoDB collections into CSVs.
 
@@ -8,7 +8,7 @@ An example showing how to export MongoDB collections into CSVs.
 ### 1. Run the API
 
 ```
-$ cd examples/csv/student
+$ cd examples/csvs/students
 $ restart api:api
  * Running on http://127.0.0.1:5000/
 ```

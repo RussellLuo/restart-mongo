@@ -1,4 +1,4 @@
-# User
+# Users
 
 An example showing how to make the MongoDB collections to be REST resources based on RESTArt-Mongo.
 
@@ -14,8 +14,8 @@ $ mongod
 ### 2. Run the API
 
 ```
-$ cd examples/user
-$ restart user:api
+$ cd examples/users
+$ restart api:api
  * Running on http://127.0.0.1:5000/
 ```
 

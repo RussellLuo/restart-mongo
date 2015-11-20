@@ -1,4 +1,4 @@
-# CSV
+# CSVs
 
 Some examples showing how to handle CSVs based on `RESTArt-Mongo`.
 
@@ -23,5 +23,5 @@ $ mongo
 
 ## Examples
 
-1. [Student](student)
-2. [Generic-CSV](generic_csv)
+1. [Students](students)
+2. [Generic-CSVs](generic_csvs)

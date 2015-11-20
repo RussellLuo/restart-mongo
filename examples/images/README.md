@@ -1,4 +1,4 @@
-# Image
+# Images
 
 An example showing how to manage files as a REST resource based on RESTArt-Mongo.
 
@@ -14,8 +14,8 @@ $ mongod
 ### 2. Run the API
 
 ```
-$ cd examples/image
-$ restart image:api
+$ cd examples/images
+$ restart api:api
 Directory `/tmp/tmpuEsOMQ` is created for storing uploaded files. Remember to remove it by hand:-)
  * Running on http://127.0.0.1:5000/
 ```

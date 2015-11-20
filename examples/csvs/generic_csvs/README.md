@@ -1,4 +1,4 @@
-# Generic-CSV
+# Generic-CSVs
 
 An example showing how to implement a generic resource that can export different databases and collections into CSVs.
 
@@ -8,7 +8,7 @@ An example showing how to implement a generic resource that can export different
 ### 1. Run the API
 
 ```
-$ cd examples/csv/generic-csv
+$ cd examples/csvs/generic-csvs
 $ restart api:api
  * Running on http://127.0.0.1:5000/
 ```

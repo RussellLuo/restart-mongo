@@ -22,6 +22,6 @@ Some examples showing how to use `RESTArt-Mongo`.
 
 ## Examples
 
-1. [User](user)
-2. [Image](image)
-3. [CSV](csv)
+1. [Users](users)
+2. [Images](images)
+3. [CSVs](csvs)

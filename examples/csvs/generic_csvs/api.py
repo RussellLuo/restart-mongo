@@ -48,7 +48,7 @@ class DynamicCSVRenderer(CSVRenderer):
 
 
 @api.register(format_suffix='mandatory')
-class GenericCSV(Resource):
+class GenericCSVs(Resource):
     name = 'generic-csvs'
 
     renderer_classes = (DynamicCSVRenderer,)
