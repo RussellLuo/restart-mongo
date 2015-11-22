@@ -20,7 +20,7 @@ Install development version from `GitHub`:
 Quickstart
 ----------
 
-Here is a very simple `User` resource, which is mapped to an `user` collection in local MongoDB:
+Here is a very simple `Users` resource, which is mapped to an `user` collection in local MongoDB:
 
     from restart.api import RESTArt
     from restart.ext.mongo.collection import Collection
@@ -29,7 +29,7 @@ Here is a very simple `User` resource, which is mapped to an `user` collection i
     api = RESTArt()
 
     @api.register
-    class User(Collection):
+    class Users(Collection):
         name = 'users'
 
         database = MongoClient().test
