@@ -61,7 +61,7 @@ class TestFiles(object):
 
     def assert_exists(self, path, exists):
         filename = os.path.join(Images.upload_folder, path)
-        assert os.path.isfile(filename) == exists
+        assert os.path.isfile(filename) is exists
 
     def test_create_image(self):
         response = self.create_image()
@@ -134,6 +134,7 @@ class TestFiles(object):
         image = db.image.find_one({'_id': bson.ObjectId(_id)})
         assert image is not None
         assert image['initial_name'] == 'test.jpg'
+        assert image['date_uploaded'].date() == now.date()
 
         # Assert the file system
         self.assert_exists(storage_path, False)
@@ -163,11 +164,40 @@ class TestFiles(object):
         image = db.image.find_one({'_id': bson.ObjectId(_id)})
         assert image is not None
         assert image['initial_name'] == 'test.jpg'
+        assert image['date_uploaded'].date() == now.date()
         assert image['extra_field'] == new_form_data['extra_field']
 
         # Assert the file system
         self.assert_exists(storage_path, False)
         self.assert_exists(image['storage_path'], True)
+
+    def test_replace_image_while_using_old_storage_path(self):
+        response = self.create_image()
+        _id = response.data['_id']
+
+        # Save the storage path for later use
+        image = db.image.find_one({'_id': bson.ObjectId(_id)})
+        storage_path = image['storage_path']
+
+        request = factory.put('/images/%s' % _id,
+                              data=self.get_data(ext='.jpg'),
+                              headers=[('X-Keep-Storage-Path', 'true')])
+        resource = self.make_resource()
+        response = resource.dispatch_request(request, _id)
+
+        # Assert the response
+        assert response.data == '""'
+        assert response.status_code == 204
+
+        # Assert the database
+        image = db.image.find_one({'_id': bson.ObjectId(_id)})
+        assert image is not None
+        assert image['initial_name'] == 'test.jpg'
+        assert image['storage_path'] == storage_path
+        assert image['date_uploaded'].date() == now.date()
+
+        # Assert the file system
+        self.assert_exists(storage_path, True)
 
     def test_update_image(self):
         response = self.create_image()

@@ -122,15 +122,26 @@ class Files(Collection):
         return super(Files, self).create(request)
 
     def replace(self, request, pk):
-        """Replace the old file with a new one."""
+        """Replace the old file with a new one.
+
+        You can set the `X-Keep-Storage-Path` headr as follows:
+
+            X-Keep-Storage-Path: true
+
+        to replace the file while still using the old storage path.
+        """
         fileobj = self.get_fileobj(request.files)
         doc = self.get_doc(pk)
 
         # Remove the old file
         self.remove_file(doc['storage_path'])
 
-        # Store the new file content to the file system
+        # Use the old storage path if `X-Keep-Storage-Path` headr is set
         file_metadata = self.get_file_metadata(fileobj)
+        if request.headers.get('X-Keep-Storage-Path'):
+            file_metadata['storage_path'] = doc['storage_path']
+
+        # Store the new file content to the file system
         self.save_file(fileobj, file_metadata['storage_path'])
 
         # Save the new file meta-data and the form data into the database
