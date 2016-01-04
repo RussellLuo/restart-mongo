@@ -131,10 +131,12 @@ class CSVRenderer(Renderer):
 
         return headers, fields
 
-    def render(self, data):
+    def render(self, data, context=None):
         """Render `data` into CSV.
 
         :param data: the data to be rendered.
+        :param context: a dictionary containing extra context data
+                        that can be useful for rendering.
         """
         assert isinstance(data, (dict, list, tuple)), \
             'The `data` argument must be a dict or a list or a tuple'
