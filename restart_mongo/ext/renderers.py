@@ -102,6 +102,9 @@ class CSVRenderer(Renderer):
     #: The default value for the missing field specified in the `columns`
     default_value = ''
 
+    #: The encoding of the final CSV
+    encoding = 'utf-8'
+
     #: The content type bound to this renderer.
     content_type = 'text/csv'
 
@@ -148,7 +151,7 @@ class CSVRenderer(Renderer):
         headers, fields = self.get_schema()
 
         csv_file = StringIO()
-        csv_writer = UnicodeCSVWriter(csv_file)
+        csv_writer = UnicodeCSVWriter(csv_file, encoding=self.encoding)
 
         # Write the headers
         csv_writer.writerow(headers)
