@@ -12,6 +12,7 @@ Here you can see the full list of changes between each RESTArt-Mongo release.
 - Update examples
 - Add support for the `X-Keep-Storage-Path` header
 - Add `context` argument for upgrading to latest RESTArt
+- Add configurable attribute `encoding` to `CSVRenderer`
 
 
 ## Version 0.1.2
