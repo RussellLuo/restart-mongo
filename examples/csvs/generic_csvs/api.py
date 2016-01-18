@@ -27,7 +27,7 @@ class DynamicCollection(Collection):
 class DynamicCSVRenderer(CSVRenderer):
     """CSVRenderer with dynamic columns."""
 
-    def render(self, data):
+    def render(self, data, context=None):
         """Override to split columns out of data."""
         # An unknown CSV (by default)
         self.columns = (('unknown', 'unknown'),)
