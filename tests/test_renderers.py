@@ -7,7 +7,7 @@ import pytest
 from restart.ext.mongo.ext.renderers import CSVRenderer
 
 
-def capitalize(value):
+def capitalize(value, context):
     return value.capitalize()
 
 
@@ -19,7 +19,7 @@ class UserCSVRenderer(CSVRenderer):
         ('missing', 'missing'),
     )
 
-    def convert_contact_phone(self, value):
+    def convert_contact_phone(self, value, context):
         return unicode('086-%s' % value)
 
 
@@ -31,7 +31,7 @@ class UnicodeUserCSVRenderer(CSVRenderer):
         (u'缺失', 'missing'),
     )
 
-    def convert_contact_phone(self, value):
+    def convert_contact_phone(self, value, context):
         return unicode('086-%s' % value)
 
 

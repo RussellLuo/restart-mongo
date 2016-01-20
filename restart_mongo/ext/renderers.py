@@ -57,6 +57,11 @@ class CSVRenderer(Renderer):
     #:              provides the original column value. To represent
     #:              a nested field, use dot (`.`) in its name.
     #: - converter: The converter used to make the final column value.
+    #:              Besides the original `value`, an additional `context`,
+    #:              which is a dictionary in the form of ``{
+    #:                  'data': <The whole row data>,
+    #:                  'renderer': <The renderer context>
+    #:              }``, will be passed into the converter callable.
     #:
     #: The converter is determined in the following order:
     #:
@@ -64,23 +69,23 @@ class CSVRenderer(Renderer):
     #:        the following prototype can be specified as a converter
     #:        in the form of 3-tuple:
     #:
-    #:         def converter(value):
+    #:         def converter(value, context):
     #:             return converted_value
     #:
     #:     2. The converter defined as a method, which has the following
     #:        prototype:
     #:
-    #:         def convert_<fieldname>(self, value):
+    #:         def convert_<fieldname>(self, value, context):
     #:             return converted_value
     #:
     #:        Note that the `fieldname` part is the column fieldname with
     #:        all its dots (`.`) transformed to underscores (`_`).
     #:
-    #:     3. If not specified, use the default converter (`unicode`).
+    #:     3. If not specified, use the default converter.
     #:
     #: For example:
     #:
-    #:     def capitalize(value):
+    #:     def capitalize(value, context):
     #:         return value.capitalize()
     #:
     #:     class UserCSVRenderer(CSVRenderer):
@@ -95,7 +100,7 @@ class CSVRenderer(Renderer):
     #:             ...
     #:         )
     #:
-    #:         def convert_contact_phone(self, value):
+    #:         def convert_contact_phone(self, value, context):
     #:             return unicode('086-%s' % value)
     columns = None
 
@@ -111,6 +116,10 @@ class CSVRenderer(Renderer):
     #: The format suffix bound to this renderer.
     format_suffix = 'csv'
 
+    def default_converter(self, value, context):
+        """The default converter."""
+        return unicode(value)
+
     def get_schema(self):
         """Get the CSV schema."""
         assert isinstance(self.columns, tuple), \
@@ -123,7 +132,7 @@ class CSVRenderer(Renderer):
             if len(column) == 2:
                 header, fieldname = column
                 methodname = 'convert_%s' % fieldname.replace('.', '_')
-                converter = getattr(self, methodname, unicode)
+                converter = getattr(self, methodname, self.default_converter)
             else:
                 header, fieldname, converter = column
 
@@ -171,7 +180,8 @@ class CSVRenderer(Renderer):
                         break
 
                 # Convert the value
-                value = converter(value)
+                converter_context = {'data': each, 'renderer': context}
+                value = converter(value, converter_context)
 
                 values.append(value)
 
