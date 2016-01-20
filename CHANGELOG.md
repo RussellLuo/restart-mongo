@@ -7,6 +7,8 @@ Here you can see the full list of changes between each RESTArt-Mongo release.
 
 (release date to be announced)
 
+- Add `context` argument to converters in `CSVRenderer`
+
 
 ## Version 0.1.3
 
