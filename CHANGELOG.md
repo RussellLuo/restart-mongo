@@ -3,9 +3,14 @@
 Here you can see the full list of changes between each RESTArt-Mongo release.
 
 
-## Version 0.1.3 - Dev
+## Version 0.1.4 - Dev
 
 (release date to be announced)
+
+
+## Version 0.1.3
+
+Released on Jan 20th 2016.
 
 - Add support for uploading files with form-data
 - Rename `File` to `Files`
