@@ -3,9 +3,9 @@
 Here you can see the full list of changes between each RESTArt-Mongo release.
 
 
-## Version 0.1.4 - Dev
+## Version 0.1.4
 
-(release date to be announced)
+Released on Mar 1st 2016.
 
 - Add `context` argument to converters in `CSVRenderer`
 
